@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  labels:
+    app: mongodb-application
+  name: external-mongo-vm
+  namespace: mongo
+spec:
+  exportTo:
+  - .
+  hosts:
+  - my-mongo.us-central1-a.c.carbon-nucleus-211209.internal
+  location: MESH_EXTERNAL
+  ports:
+  - name: mongodb
+    number: 27017
+    protocol: TCP
+  resolution: DNS

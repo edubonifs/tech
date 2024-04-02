@@ -1,0 +1,4 @@
+six
+google-cloud-compute
+google-cloud-storage
+google-cloud-build

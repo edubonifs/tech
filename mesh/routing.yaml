@@ -1,0 +1,39 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: mongo-wiz-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "mongo.wiz"
+    tls:
+      mode: SIMPLE
+      credentialName: mongo-wiz-secret
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: mongo-wiz
+  namespace: mongo
+spec:
+  hosts:
+  - "mongo.wiz"
+  gateways:
+  - istio-system/mongo-wiz-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: mongodb-application-service
+        port:
+          number: 80

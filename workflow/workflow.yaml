@@ -1,0 +1,22 @@
+main:
+  params: [args]
+  steps:
+    - createSnapshotAndImage:
+        call: http.post
+        args:
+          url: ${"https://us-central1-carbon-nucleus-211209.cloudfunctions.net/create_snapshot_and_image"}
+          body:
+            project_id: ${args.project_id}
+            vm_name: ${args.vm_name}
+            zone: ${args.zone}
+            disk_name: ${args.disk_name}
+        result: snapshotAndImageResult
+
+    - exportImageToBucket:
+        call: http.post
+        args:
+          url: ${"https://us-central1-carbon-nucleus-211209.cloudfunctions.net/export_image_to_bucket"}
+          body:
+            project_id: ${args.project_id}
+            image_name: ${snapshotAndImageResult.body.image_name}
+            bucket_name: ${args.bucket_name}

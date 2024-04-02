@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb-application
+  namespace: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-application
+  template:
+    metadata:
+      labels:
+        app: mongodb-application
+    spec:
+      containers:
+      - name: mongodb-application
+        image: edubonix/mongo-app:v2.1
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_USER
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-pass
+        - name: MONGO_HOST
+          value: my-mongo.us-central1-a.c.carbon-nucleus-211209.internal
+        - name: MONGO_PORT
+          value: "27017"  # Default MongoDB port
+        - name: MONGO_DB_NAME
+          value: "sampledb"
+      serviceAccountName: mongo-client 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-application-service
+  namespace: mongo
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: mongodb-application
